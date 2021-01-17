@@ -1,0 +1,229 @@
+{
+	"info": {
+		"_postman_id": "b6f1c51d-efa7-465e-b224-6f4979df10f8",
+		"name": "API_Tests_Genba",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Obtain Access Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6b187fc8-05a3-43a8-b4ee-899f0a2169c3",
+						"exec": [
+							"pm.test(\"Response 200 and token returned\", function() {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    token = responseBody;\r",
+							"    console.log(token);\r",
+							"    pm.collectionVariables.set(\"token\", token);\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": {{email}},\r\n    \"password\": {{password}}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://www.galacticoeleven.com/login",
+					"protocol": "https",
+					"host": [
+						"www",
+						"galacticoeleven",
+						"com"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a League",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "125782bc-d438-4fdb-ba6a-61b6d8fd4927",
+						"exec": [
+							"pm.test(\"Response 200 and league details verified\", function() {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    response = JSON.parse(responseBody);\r",
+							"    //console.log(response);\r",
+							"    pm.expect(response.name).to.equal(\"Some league name\");\r",
+							"    pm.expect(response.competition).to.equal(4);\r",
+							"    console.log(`Created League's ID: ` + response._id);\r",
+							"    pm.collectionVariables.set(\"leagueId\", response._id);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\":\"Some league name\",\r\n    \"competition\":4\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://www.galacticoeleven.com/api/league/",
+					"protocol": "https",
+					"host": [
+						"www",
+						"galacticoeleven",
+						"com"
+					],
+					"path": [
+						"api",
+						"league",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Verify League Created",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3c70ae6b-cc8b-4faa-b938-c7670da9b199",
+						"exec": [
+							"pm.test(\"Response 200 and league details verified\", function() {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    response = JSON.parse(responseBody);\r",
+							"    console.log(response);\r",
+							"    var createdLeague = _.find(response, function(obj) {\r",
+							"        if (obj._id === pm.variables.get(\"leagueId\")) {\r",
+							"            return true;\r",
+							"        }\r",
+							"    })\r",
+							"    pm.expect(createdLeague.name).to.equal(\"Some league name\");\r",
+							"    pm.expect(createdLeague.competition).to.equal(4);\r",
+							"    pm.expect(createdLeague._id).to.equal(pm.variables.get(\"leagueId\"));\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://www.galacticoeleven.com/api/league/",
+					"protocol": "https",
+					"host": [
+						"www",
+						"galacticoeleven",
+						"com"
+					],
+					"path": [
+						"api",
+						"league",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "077e486c-3047-4f1b-b540-7c7bcf1dd6b0",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "e70ff55e-85e7-451a-95a8-5c8fab4c680c",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "8156ec68-9986-4c8e-8394-6fdd34d01b52",
+			"key": "email",
+			"value": "\"tetaxog820@vy89.com\""
+		},
+		{
+			"id": "901a9621-53a8-4cbd-a818-f3f437e621f1",
+			"key": "password",
+			"value": "\"Thisisatestp4ssword\""
+		},
+		{
+			"id": "4a7c749f-61db-4905-b3aa-2e8ecac098f9",
+			"key": "token",
+			"value": ""
+		},
+		{
+			"id": "004d569f-cce7-48b8-9762-c805a3ff3fc5",
+			"key": "leagueId",
+			"value": ""
+		}
+	],
+	"protocolProfileBehavior": {}
+}

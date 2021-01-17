@@ -19,6 +19,7 @@ namespace GenbaTechnicalTest
         public const string tokenURL = "https://www.galacticoeleven.com/login";
         public const string createURL = "https://www.galacticoeleven.com/api/league/";
         public string token = string.Empty;
+        public string leagueID = string.Empty;
 
 
         public void GetToken()
@@ -43,41 +44,64 @@ namespace GenbaTechnicalTest
            
         }
 
-        public void CreateLeague()
+        public void CreateLeague(string leagueName, int competition)
         {
             // arrange
             RestClient client = new RestClient(createURL);
             JObject jObjectbody = new JObject();
-            jObjectbody.Add("name", "Some league name");
-            jObjectbody.Add("competition", 4);
+            jObjectbody.Add("name", leagueName);
+            jObjectbody.Add("competition", competition);
             RestRequest restRequest = new RestRequest(Method.POST);
             var bearerToken = this.token;
-            Console.WriteLine(bearerToken);
+           // Console.WriteLine(bearerToken);
             restRequest.AddHeader("Authorization", bearerToken);
             restRequest.AddHeader("Content-Type", "application/json");
             restRequest.AddParameter("application/json", jObjectbody, ParameterType.RequestBody);
 
             // act
             IRestResponse response = client.Execute(restRequest);
-            Console.WriteLine(response.Content);
-            Console.WriteLine(jObjectbody);
+            //Console.WriteLine(response.Content);
+            //Console.WriteLine(jObjectbody);
             
 
             // assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(response.Content.Contains(leagueName));
+            Assert.That(response.Content.Contains(competition.ToString()));
+            var jObject = JObject.Parse(response.Content);
+           // Console.WriteLine(jObject);
+            this.leagueID = jObject.GetValue("_id").ToString();
+           // Console.WriteLine(this.leagueID);
 
         }
 
-        public void postman()
+        public void CheckLeagueCreated(string leagueName, int competition)
         {
-            var client = new RestClient("https://www.galacticoeleven.com/api/league/");
-            client.Timeout = -1;
-            var request = new RestRequest(Method.POST);
-            request.AddHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MDAzZmM5MDI5YjUwOTAwMTYxODIyNDQiLCJpYXQiOjE2MTA4OTMzOTcsImV4cCI6MTYxMzQ4NTM5N30.5AoHHTjo1zwnpl6et8N-TwGjjiHBg3L1X0lGYsV8LGE");
-            request.AddHeader("Content-Type", "application/json");
-            request.AddParameter("application/json", "{\r\n    \"name\":\"Some league name\",\r\n    \"competition\":4\r\n}", ParameterType.RequestBody);
-            IRestResponse response = client.Execute(request);
-            Console.WriteLine(response.Content);
+            //arrange
+            RestClient client = new RestClient(createURL);
+            RestRequest restRequest = new RestRequest(Method.GET);
+            var bearerToken = this.token;
+            // Console.WriteLine(bearerToken);
+            restRequest.AddHeader("Authorization", bearerToken);
+            restRequest.AddHeader("Content-Type", "application/json");
+
+            // act
+            IRestResponse response = client.Execute(restRequest);
+            //Console.WriteLine(response.Content);
+
+            // assert
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            var responseArray = JArray.Parse(response.Content);
+            Console.WriteLine("League Id: " + this.leagueID);
+            JObject createdLeague = responseArray.Children<JObject>()
+            .FirstOrDefault(o => o["_id"] != null && o["_id"].ToString() == this.leagueID);
+            //Console.WriteLine(createdLeague);
+            var createdLeagueName = createdLeague["name"].ToString();
+            //Console.WriteLine(createdLeagueName);
+            var createdLeagueCompetition = createdLeague["competition"].ToString();
+            //Console.WriteLine(createdLeagueCompetition);
+            Assert.AreEqual(createdLeagueName, leagueName);
+            Assert.AreEqual(createdLeagueCompetition, competition.ToString());            
         }
     }
 }

@@ -16,6 +16,7 @@ namespace GenbaTechnicalTest
 
     public class APIData
     {
+        Users users = new Users();
         public const string tokenURL = "https://www.galacticoeleven.com/login";
         public const string createURL = "https://www.galacticoeleven.com/api/league/";
         public string token = string.Empty;
@@ -27,8 +28,8 @@ namespace GenbaTechnicalTest
             //arrange
             RestClient client = new RestClient(tokenURL);
             JObject jObjectbody = new JObject();
-            jObjectbody.Add("email", "tetaxog820@vy89.com");
-            jObjectbody.Add("password", "Thisisatestp4ssword");
+            jObjectbody.Add("email", users.email );
+            jObjectbody.Add("password", users.password);
 
             RestRequest restRequest = new RestRequest(Method.POST);
             restRequest.AddParameter("application/json", jObjectbody, ParameterType.RequestBody);
@@ -41,7 +42,6 @@ namespace GenbaTechnicalTest
 
             // assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-           
         }
 
         public void CreateLeague(string leagueName, int competition)
@@ -61,8 +61,7 @@ namespace GenbaTechnicalTest
             // act
             IRestResponse response = client.Execute(restRequest);
             //Console.WriteLine(response.Content);
-            //Console.WriteLine(jObjectbody);
-            
+            //Console.WriteLine(jObjectbody);            
 
             // assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -94,14 +93,14 @@ namespace GenbaTechnicalTest
             var responseArray = JArray.Parse(response.Content);
             Console.WriteLine("League Id: " + this.leagueID);
             JObject createdLeague = responseArray.Children<JObject>()
-            .FirstOrDefault(o => o["_id"] != null && o["_id"].ToString() == this.leagueID);
+                .FirstOrDefault(o => o["_id"] != null && o["_id"].ToString() == this.leagueID);
             //Console.WriteLine(createdLeague);
             var createdLeagueName = createdLeague["name"].ToString();
             //Console.WriteLine(createdLeagueName);
             var createdLeagueCompetition = createdLeague["competition"].ToString();
             //Console.WriteLine(createdLeagueCompetition);
             Assert.AreEqual(createdLeagueName, leagueName);
-            Assert.AreEqual(createdLeagueCompetition, competition.ToString());            
+            Assert.AreEqual(createdLeagueCompetition, competition.ToString());
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace GenbaTechnicalTest
 {
-    class APITests
+    class Second_APITests
     {
         APIData api = new APIData();
         HomePage homePage = new HomePage();

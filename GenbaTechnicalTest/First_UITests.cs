@@ -4,7 +4,7 @@ using OpenQA.Selenium.Chrome;
 namespace GenbaTechnicalTest
 {
     
-    class CreateLeagueTests
+    class First_UITests
     {
         LoginPage loginPage = new LoginPage();
         Users users = new Users();
